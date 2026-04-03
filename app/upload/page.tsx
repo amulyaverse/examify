@@ -1,15 +1,18 @@
 export default function UploadPage() {
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-6">Upload File</h1>
-
-      <div className="bg-white shadow-md rounded-xl p-8 max-w-xl">
+    <div className="min-h-screen bg-gradient-to-br from-white to-teal-50 flex items-center justify-center p-6">
+      
+      <div className="bg-white shadow-xl rounded-2xl p-10 w-full max-w-xl border border-gray-100">
         
+        <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">
+          Upload File
+        </h1>
+
         {/* Upload Box */}
-        <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg h-56 cursor-pointer hover:border-blue-500 transition">
+        <label className="flex flex-col items-center justify-center border-2 border-dashed border-teal-300 rounded-xl h-56 cursor-pointer hover:border-teal-500 hover:bg-teal-50 transition-all duration-300">
           
           <svg
-            className="w-12 h-12 text-gray-400 mb-3"
+            className="w-14 h-14 text-teal-400 mb-3"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
@@ -18,7 +21,7 @@ export default function UploadPage() {
             <path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" />
           </svg>
 
-          <p className="text-gray-500">
+          <p className="text-gray-600 font-medium">
             Drag & Drop your file here
           </p>
 
@@ -30,7 +33,7 @@ export default function UploadPage() {
         </label>
 
         {/* Upload Button */}
-        <button className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+        <button className="mt-6 w-full bg-teal-500 text-white py-3 rounded-xl font-semibold tracking-wide hover:bg-teal-600 transition-all duration-300 shadow-md hover:shadow-lg">
           Upload File
         </button>
 
