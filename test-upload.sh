@@ -1,0 +1,17 @@
+# Create a test text file
+echo "1. What is 2+2?
+A) 3
+B) 4
+C) 5
+D) 6
+Answer: B
+
+2. What is the capital of France?
+A) London
+B) Berlin
+C) Paris
+D) Madrid
+Answer: C" > test.txt
+
+# Test upload
+curl -X POST http://localhost:3000/api/upload -F "file=@test.txt"
