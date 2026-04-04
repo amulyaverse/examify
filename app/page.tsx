@@ -32,12 +32,12 @@ export default function Home() {
           </div>
           
           <div className="flex space-x-3">
-            <Link href="/login">
+            <Link href="/sign-in">
               <button className="px-5 py-2 text-gray-700 hover:text-blue-600 transition">
                 Login
               </button>
             </Link>
-            <Link href="/signup">
+            <Link href="/sign-up">
               <button className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-md">
                 Sign Up Free
               </button>
@@ -190,7 +190,7 @@ export default function Home() {
             Join thousands of educators and students using Examify
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/signup">
+            <Link href="/sign-up">
               <button className="px-8 py-4 bg-white text-blue-600 rounded-xl text-lg font-semibold hover:bg-gray-100 transition shadow-lg">
                 Create Free Account
               </button>

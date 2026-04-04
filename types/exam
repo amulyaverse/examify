@@ -1,0 +1,66 @@
+// Question types
+export type QuestionType = 'single' | 'multiple' | 'numerical';
+
+export interface Question {
+  id: string;
+  type: QuestionType;
+  question: string;
+  options?: string[];
+  correctAnswer: string | string[] | number;
+  subject: string;
+  marks: number;
+  negativeMarks: number;
+  explanation?: string;
+}
+
+export interface Exam {
+  _id: string;
+  title: string;
+  description: string;
+  duration: number;
+  totalMarks: number;
+  totalQuestions: number;
+  questions: Question[];
+  createdBy: string;
+  isPublic: boolean;
+  shareableLink: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserAnswer {
+  questionId: string;
+  answer: string | string[] | number;
+  isMarkedForReview: boolean;
+  timeSpent: number;
+}
+
+export interface ExamResult {
+  _id: string;
+  userId: string;
+  examId: string;
+  totalScore: number;
+  obtainedScore: number;
+  totalQuestions: number;
+  attemptedQuestions: number;
+  correctAnswers: number;
+  wrongAnswers: number;
+  subjectWiseScore: Record<string, SubjectScore>;
+  timeTaken: number;
+  percentage: number;
+  rank?: number;
+  createdAt: Date;
+}
+
+export interface SubjectScore {
+  correct: number;
+  total: number;
+  score: number;
+}
+
+export interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}

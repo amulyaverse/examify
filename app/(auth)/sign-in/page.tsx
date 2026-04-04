@@ -59,7 +59,7 @@ export default function SignIn() {
 
           <p className="text-center mt-6 text-sm">
             Are you new?{" "}
-            <a href="/signup" className="text-blue-500">
+            <a href="/sign-up" className="text-blue-500">
               Create an Account
             </a>
           </p>
