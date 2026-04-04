@@ -1,3 +1,4 @@
+import { parseQuestionsWithGemini } from '@/lib/ai/geminiParser';
 import { NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
@@ -5,7 +6,6 @@ import { connectDB } from '@/lib/db/mongodb';
 import Exam from '@/lib/db/models/Exam';
 import { parsePDF } from '@/lib/ocr/pdfParser';
 import { parseImage } from '@/lib/ocr/imageParser';
-import { parseQuestionsWithGemini } from '@/lib/ai/geminiParser';
 
 export async function POST(req: Request) {
   try {
