@@ -1,10 +1,86 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function AuthPage() {
+  const router = useRouter();
   const [tab, setTab] = useState<"signin" | "signup">("signin");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // Sign In Handler
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+        router.push("/dashboard");
+      } else {
+        setError(data.error || "Login failed");
+      }
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    }
+    
+    setLoading(false);
+  };
+
+  // Sign Up Handler
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setTab("signin");
+        setError("");
+        alert("Account created! Please sign in.");
+      } else {
+        setError(data.error || "Signup failed");
+      }
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+    }
+    
+    setLoading(false);
+  };
 
   return (
     <div
@@ -19,11 +95,10 @@ export default function AuthPage() {
           minHeight: "560px",
         }}
       >
-        {/* ── Left: Form Panel ── */}
+        {/* Left: Form Panel */}
         <div className="flex flex-col justify-center w-full md:w-1/2 px-10 py-12">
-
-          {/* Logo */}
-          <div className="flex items-center gap-2 mb-8">
+          {/* Logo with Link */}
+          <Link href="/" className="flex items-center gap-2 mb-8">
             <span style={{ fontSize: 26 }}>🎓</span>
             <span
               className="font-black tracking-tight"
@@ -31,20 +106,37 @@ export default function AuthPage() {
             >
               Examify
             </span>
-          </div>
+          </Link>
 
           {/* Title */}
           <h1
             className="font-bold mb-1"
             style={{ fontSize: 28, color: "#1a1a2e", fontFamily: "'Poppins', sans-serif" }}
           >
-            Welcome Back
+            {tab === "signin" ? "Welcome Back" : "Create Account"}
           </h1>
           <p style={{ fontSize: 13, color: "#8a94a6", marginBottom: 28 }}>
             {tab === "signin"
               ? "Enter your credentials to continue"
               : "Create your free account today"}
           </p>
+
+          {/* Error Message */}
+          {error && (
+            <div
+              style={{
+                background: "#fee2e2",
+                color: "#dc2626",
+                padding: "10px",
+                borderRadius: 8,
+                fontSize: 12,
+                marginBottom: 16,
+                textAlign: "center",
+              }}
+            >
+              ❌ {error}
+            </div>
+          )}
 
           {/* Tabs */}
           <div
@@ -59,7 +151,10 @@ export default function AuthPage() {
             {(["signin", "signup"] as const).map((t) => (
               <button
                 key={t}
-                onClick={() => setTab(t)}
+                onClick={() => {
+                  setTab(t);
+                  setError("");
+                }}
                 className="flex-1 py-2 text-sm font-semibold transition-all duration-300 relative z-10"
                 style={{
                   borderRadius: 9,
@@ -68,7 +163,6 @@ export default function AuthPage() {
                   color: tab === t ? "#fff" : "#8a94a6",
                   border: "none",
                   cursor: "pointer",
-                  transition: "background 0.3s ease, color 0.3s ease",
                 }}
               >
                 {t === "signin" ? "Sign In" : "Sign Up"}
@@ -76,22 +170,22 @@ export default function AuthPage() {
             ))}
           </div>
 
-          {/* Form — animated slide */}
-          <div style={{ position: "relative", overflow: "hidden" }}>
-
-            {/* Sign In Form */}
-            <div
-              style={{
-                transition: "opacity 0.35s ease, transform 0.35s ease",
-                opacity: tab === "signin" ? 1 : 0,
-                transform: tab === "signin" ? "translateX(0)" : "translateX(-32px)",
-                pointerEvents: tab === "signin" ? "auto" : "none",
-                position: tab === "signin" ? "relative" : "absolute",
-                top: 0, left: 0, width: "100%",
-              }}
-            >
-              <InputField icon="✉️" type="email" placeholder="Email address" />
-              <InputField icon="🔒" type="password" placeholder="Password" />
+          {/* Sign In Form */}
+          <div
+            style={{
+              transition: "opacity 0.35s ease, transform 0.35s ease",
+              opacity: tab === "signin" ? 1 : 0,
+              transform: tab === "signin" ? "translateX(0)" : "translateX(-32px)",
+              pointerEvents: tab === "signin" ? "auto" : "none",
+              position: tab === "signin" ? "relative" : "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+            }}
+          >
+            <form onSubmit={handleSignIn}>
+              <InputField icon="✉️" name="email" type="email" placeholder="Email address" />
+              <InputField icon="🔒" name="password" type="password" placeholder="Password" />
 
               <div className="flex justify-end mb-6">
                 <a
@@ -102,34 +196,42 @@ export default function AuthPage() {
                 </a>
               </div>
 
-              <PrimaryButton>Continue</PrimaryButton>
+              <PrimaryButton disabled={loading}>
+                {loading ? "Signing in..." : "Continue"}
+              </PrimaryButton>
+            </form>
 
-              <Divider />
-              <GoogleButton />
-            </div>
+            <Divider />
+            <GoogleButton />
+          </div>
 
-            {/* Sign Up Form */}
-            <div
-              style={{
-                transition: "opacity 0.35s ease, transform 0.35s ease",
-                opacity: tab === "signup" ? 1 : 0,
-                transform: tab === "signup" ? "translateX(0)" : "translateX(32px)",
-                pointerEvents: tab === "signup" ? "auto" : "none",
-                position: tab === "signup" ? "relative" : "absolute",
-                top: 0, left: 0, width: "100%",
-              }}
-            >
-              <InputField icon="👤" type="text" placeholder="Full name" />
-              <InputField icon="✉️" type="email" placeholder="Email address" />
-              <InputField icon="🔒" type="password" placeholder="Password" />
+          {/* Sign Up Form */}
+          <div
+            style={{
+              transition: "opacity 0.35s ease, transform 0.35s ease",
+              opacity: tab === "signup" ? 1 : 0,
+              transform: tab === "signup" ? "translateX(0)" : "translateX(32px)",
+              pointerEvents: tab === "signup" ? "auto" : "none",
+              position: tab === "signup" ? "relative" : "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+            }}
+          >
+            <form onSubmit={handleSignUp}>
+              <InputField icon="👤" name="name" type="text" placeholder="Full name" />
+              <InputField icon="✉️" name="email" type="email" placeholder="Email address" />
+              <InputField icon="🔒" name="password" type="password" placeholder="Password (min 6 chars)" />
 
               <div style={{ marginBottom: 24 }} />
 
-              <PrimaryButton>Create Account</PrimaryButton>
+              <PrimaryButton disabled={loading}>
+                {loading ? "Creating account..." : "Create Account"}
+              </PrimaryButton>
+            </form>
 
-              <Divider />
-              <GoogleButton label="Sign up with Google" />
-            </div>
+            <Divider />
+            <GoogleButton label="Sign up with Google" />
           </div>
 
           {/* Bottom link */}
@@ -139,7 +241,14 @@ export default function AuthPage() {
                 New here?{" "}
                 <button
                   onClick={() => setTab("signup")}
-                  style={{ color: "#386bff", background: "none", border: "none", cursor: "pointer", fontWeight: 600, fontSize: 12 }}
+                  style={{
+                    color: "#386bff",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    fontSize: 12,
+                  }}
                 >
                   Create an account
                 </button>
@@ -149,7 +258,14 @@ export default function AuthPage() {
                 Already have an account?{" "}
                 <button
                   onClick={() => setTab("signin")}
-                  style={{ color: "#386bff", background: "none", border: "none", cursor: "pointer", fontWeight: 600, fontSize: 12 }}
+                  style={{
+                    color: "#386bff",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                    fontSize: 12,
+                  }}
                 >
                   Sign in
                 </button>
@@ -158,34 +274,36 @@ export default function AuthPage() {
           </p>
         </div>
 
-        {/* ── Right: Image Panel ── */}
+        {/* Right: Image Panel */}
         <div
           className="hidden md:block w-1/2 relative overflow-hidden"
           style={{ borderRadius: "0 24px 24px 0" }}
         >
-          <img
-            src="/login-image.png"
-            alt="Examify illustration"
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
-          />
-          {/* Blue gradient overlay like reference */}
           <div
             style={{
               position: "absolute",
               inset: 0,
-              background: "linear-gradient(135deg, rgba(56,107,255,0.18) 0%, rgba(100,180,255,0.10) 100%)",
+              background: "linear-gradient(135deg, #386bff 0%, #6c5ce7 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              padding: "40px",
+              color: "white",
+              textAlign: "center",
             }}
-          />
+          >
+            <div style={{ fontSize: 64, marginBottom: 20 }}>🎓</div>
+            <h2 style={{ fontSize: 28, fontWeight: "bold", marginBottom: 12 }}>
+              Examify
+            </h2>
+            <p style={{ fontSize: 14, opacity: 0.9 }}>
+              Convert any question paper into an interactive online exam
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Poppins font */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
       `}</style>
@@ -193,14 +311,15 @@ export default function AuthPage() {
   );
 }
 
-/* ── Sub-components ── */
-
+// Updated InputField with name attribute
 function InputField({
   icon,
+  name,
   type,
   placeholder,
 }: {
   icon: string;
+  name: string;
   type: string;
   placeholder: string;
 }) {
@@ -217,17 +336,13 @@ function InputField({
         marginBottom: 12,
         transition: "border-color 0.2s",
       }}
-      onFocus={(e) =>
-        ((e.currentTarget as HTMLDivElement).style.borderColor = "#386bff")
-      }
-      onBlur={(e) =>
-        ((e.currentTarget as HTMLDivElement).style.borderColor = "#e8eeff")
-      }
     >
       <span style={{ fontSize: 15, lineHeight: 1 }}>{icon}</span>
       <input
+        name={name}
         type={type}
         placeholder={placeholder}
+        required
         style={{
           background: "transparent",
           border: "none",
@@ -242,27 +357,31 @@ function InputField({
   );
 }
 
-function PrimaryButton({ children }: { children: React.ReactNode }) {
+function PrimaryButton({ children, disabled }: { children: React.ReactNode; disabled?: boolean }) {
   return (
     <button
+      type="submit"
+      disabled={disabled}
       style={{
         width: "100%",
         padding: "13px",
-        background: "#386bff",
+        background: disabled ? "#a0a0a0" : "#386bff",
         color: "#fff",
         border: "none",
         borderRadius: 12,
         fontSize: 14,
         fontWeight: 700,
         fontFamily: "'Poppins', sans-serif",
-        cursor: "pointer",
+        cursor: disabled ? "not-allowed" : "pointer",
         transition: "background 0.2s, transform 0.1s",
         letterSpacing: 0.3,
       }}
-      onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "#2655e0")}
-      onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "#386bff")}
-      onMouseDown={(e) => ((e.currentTarget as HTMLButtonElement).style.transform = "scale(0.98)")}
-      onMouseUp={(e) => ((e.currentTarget as HTMLButtonElement).style.transform = "scale(1)")}
+      onMouseEnter={(e) => {
+        if (!disabled) (e.currentTarget as HTMLButtonElement).style.background = "#2655e0";
+      }}
+      onMouseLeave={(e) => {
+        if (!disabled) (e.currentTarget as HTMLButtonElement).style.background = "#386bff";
+      }}
     >
       {children}
     </button>
@@ -284,6 +403,7 @@ function Divider() {
 function GoogleButton({ label = "Sign in with Google" }: { label?: string }) {
   return (
     <button
+      type="button"
       style={{
         width: "100%",
         padding: "11px",
@@ -301,8 +421,6 @@ function GoogleButton({ label = "Sign in with Google" }: { label?: string }) {
         color: "#1a1a2e",
         transition: "border-color 0.2s, background 0.2s",
       }}
-      onMouseEnter={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "#f7f9ff")}
-      onMouseLeave={(e) => ((e.currentTarget as HTMLButtonElement).style.background = "#fff")}
     >
       <svg width="16" height="16" viewBox="0 0 48 48">
         <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>

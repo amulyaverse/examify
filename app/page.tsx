@@ -37,12 +37,12 @@ export default function Home() {
           <div className="flex space-x-3 items-center">
             {/* ✅ Dark mode toggle added here */}
             <DarkModeToggle />
-            <Link href="/sign-in">
+            <Link href="/auth">
               <button className="px-5 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
                 Login
               </button>
             </Link>
-            <Link href="/sign-up">
+            <Link href="/auth">
               <button className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition shadow-md">
                 Sign Up Free
               </button>
@@ -195,7 +195,7 @@ export default function Home() {
             Join thousands of educators and students using Examify
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/sign-up">
+            <Link href="/auth">
               <button className="px-8 py-4 bg-white text-blue-600 rounded-xl text-lg font-semibold hover:bg-gray-100 transition shadow-lg">
                 Create Free Account
               </button>
