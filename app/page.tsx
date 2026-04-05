@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import DarkModeToggle from '@/components/DarkModeToggle';
 
 export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -13,27 +14,31 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Navigation Bar */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'
+        isScrolled
+          ? 'bg-white dark:bg-gray-900 shadow-md py-3'
+          : 'bg-transparent py-5'
       }`}>
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <span className="text-3xl">🎓</span>
-            <span className="text-2xl font-bold text-blue-700">Examify</span>
+            <span className="text-2xl font-bold text-blue-700 dark:text-blue-400">Examify</span>
           </div>
           
           <div className="hidden md:flex space-x-8">
-            <a href="#features" className="text-gray-700 hover:text-blue-600 transition">Features</a>
-            <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition">How It Works</a>
-            <a href="#pricing" className="text-gray-700 hover:text-blue-600 transition">Pricing</a>
-            <a href="#contact" className="text-gray-700 hover:text-blue-600 transition">Contact</a>
+            <a href="#features" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Features</a>
+            <a href="#how-it-works" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">How It Works</a>
+            <a href="#pricing" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Pricing</a>
+            <a href="#contact" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">Contact</a>
           </div>
           
-          <div className="flex space-x-3">
+          <div className="flex space-x-3 items-center">
+            {/* ✅ Dark mode toggle added here */}
+            <DarkModeToggle />
             <Link href="/sign-in">
-              <button className="px-5 py-2 text-gray-700 hover:text-blue-600 transition">
+              <button className="px-5 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition">
                 Login
               </button>
             </Link>
@@ -47,19 +52,19 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <section className="pt-32 pb-20 px-4 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
         <div className="container mx-auto text-center">
           <div className="animate-fade-in-up">
-            <div className="inline-block px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm mb-6">
+            <div className="inline-block px-4 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm mb-6">
               🚀 AI-Powered Exam Platform
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6">
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6">
               Convert Any Question Paper to{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
                 Online Exam
               </span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-3xl mx-auto">
               Upload PDFs, images, or paste text. Our AI instantly transforms them 
               into interactive exams with timer, analytics, and instant results.
             </p>
@@ -70,7 +75,7 @@ export default function Home() {
                 </button>
               </Link>
               <Link href="/demo">
-                <button className="px-8 py-4 border-2 border-blue-600 text-blue-600 rounded-xl text-lg font-semibold hover:bg-blue-50 transition flex items-center justify-center gap-2">
+                <button className="px-8 py-4 border-2 border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400 rounded-xl text-lg font-semibold hover:bg-blue-50 dark:hover:bg-gray-800 transition flex items-center justify-center gap-2">
                   <span>🎯</span> Try Demo Exam
                 </button>
               </Link>
@@ -80,103 +85,103 @@ export default function Home() {
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20">
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600">10K+</div>
-              <div className="text-gray-600 mt-1">Exams Created</div>
+              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">10K+</div>
+              <div className="text-gray-600 dark:text-gray-400 mt-1">Exams Created</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600">50K+</div>
-              <div className="text-gray-600 mt-1">Students</div>
+              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">50K+</div>
+              <div className="text-gray-600 dark:text-gray-400 mt-1">Students</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600">98%</div>
-              <div className="text-gray-600 mt-1">Satisfaction</div>
+              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">98%</div>
+              <div className="text-gray-600 dark:text-gray-400 mt-1">Satisfaction</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600">24/7</div>
-              <div className="text-gray-600 mt-1">Support</div>
+              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">24/7</div>
+              <div className="text-gray-600 dark:text-gray-400 mt-1">Support</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-white">
+      <section id="features" className="py-20 px-4 bg-white dark:bg-gray-900">
         <div className="container mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Powerful Features</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Powerful Features</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               Everything you need to create and manage online exams
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-md hover:shadow-xl transition">
+            <div className="bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 p-8 rounded-2xl shadow-md hover:shadow-xl transition">
               <div className="text-5xl mb-4">📄</div>
-              <h3 className="text-xl font-bold mb-2">Any Format</h3>
-              <p className="text-gray-600">Upload PDFs, images (PNG, JPG), or paste text directly. We support all formats.</p>
+              <h3 className="text-xl font-bold mb-2 dark:text-white">Any Format</h3>
+              <p className="text-gray-600 dark:text-gray-400">Upload PDFs, images (PNG, JPG), or paste text directly. We support all formats.</p>
             </div>
             
-            <div className="bg-gradient-to-br from-green-50 to-white p-8 rounded-2xl shadow-md hover:shadow-xl transition">
+            <div className="bg-gradient-to-br from-green-50 to-white dark:from-gray-800 dark:to-gray-900 p-8 rounded-2xl shadow-md hover:shadow-xl transition">
               <div className="text-5xl mb-4">🤖</div>
-              <h3 className="text-xl font-bold mb-2">AI-Powered</h3>
-              <p className="text-gray-600">Automatic question parsing and answer extraction using advanced AI.</p>
+              <h3 className="text-xl font-bold mb-2 dark:text-white">AI-Powered</h3>
+              <p className="text-gray-600 dark:text-gray-400">Automatic question parsing and answer extraction using advanced AI.</p>
             </div>
             
-            <div className="bg-gradient-to-br from-purple-50 to-white p-8 rounded-2xl shadow-md hover:shadow-xl transition">
+            <div className="bg-gradient-to-br from-purple-50 to-white dark:from-gray-800 dark:to-gray-900 p-8 rounded-2xl shadow-md hover:shadow-xl transition">
               <div className="text-5xl mb-4">⏰</div>
-              <h3 className="text-xl font-bold mb-2">Smart Timer</h3>
-              <p className="text-gray-600">Automatic submission when time expires with visual warnings.</p>
+              <h3 className="text-xl font-bold mb-2 dark:text-white">Smart Timer</h3>
+              <p className="text-gray-600 dark:text-gray-400">Automatic submission when time expires with visual warnings.</p>
             </div>
             
-            <div className="bg-gradient-to-br from-yellow-50 to-white p-8 rounded-2xl shadow-md hover:shadow-xl transition">
+            <div className="bg-gradient-to-br from-yellow-50 to-white dark:from-gray-800 dark:to-gray-900 p-8 rounded-2xl shadow-md hover:shadow-xl transition">
               <div className="text-5xl mb-4">📊</div>
-              <h3 className="text-xl font-bold mb-2">Detailed Analytics</h3>
-              <p className="text-gray-600">Subject-wise performance, accuracy metrics, and improvement insights.</p>
+              <h3 className="text-xl font-bold mb-2 dark:text-white">Detailed Analytics</h3>
+              <p className="text-gray-600 dark:text-gray-400">Subject-wise performance, accuracy metrics, and improvement insights.</p>
             </div>
             
-            <div className="bg-gradient-to-br from-red-50 to-white p-8 rounded-2xl shadow-md hover:shadow-xl transition">
+            <div className="bg-gradient-to-br from-red-50 to-white dark:from-gray-800 dark:to-gray-900 p-8 rounded-2xl shadow-md hover:shadow-xl transition">
               <div className="text-5xl mb-4">💾</div>
-              <h3 className="text-xl font-bold mb-2">Auto-Save</h3>
-              <p className="text-gray-600">Answers are automatically saved. Resume exactly where you left off.</p>
+              <h3 className="text-xl font-bold mb-2 dark:text-white">Auto-Save</h3>
+              <p className="text-gray-600 dark:text-gray-400">Answers are automatically saved. Resume exactly where you left off.</p>
             </div>
             
-            <div className="bg-gradient-to-br from-indigo-50 to-white p-8 rounded-2xl shadow-md hover:shadow-xl transition">
+            <div className="bg-gradient-to-br from-indigo-50 to-white dark:from-gray-800 dark:to-gray-900 p-8 rounded-2xl shadow-md hover:shadow-xl transition">
               <div className="text-5xl mb-4">📱</div>
-              <h3 className="text-xl font-bold mb-2">Mobile Responsive</h3>
-              <p className="text-gray-600">Perfect experience on desktop, tablet, and mobile devices.</p>
+              <h3 className="text-xl font-bold mb-2 dark:text-white">Mobile Responsive</h3>
+              <p className="text-gray-600 dark:text-gray-400">Perfect experience on desktop, tablet, and mobile devices.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 px-4 bg-gray-50">
+      <section id="how-it-works" className="py-20 px-4 bg-gray-50 dark:bg-gray-800">
         <div className="container mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
-            <p className="text-xl text-gray-600">Create an exam in 4 simple steps</p>
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">How It Works</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400">Create an exam in 4 simple steps</p>
           </div>
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">1</div>
-              <h3 className="text-xl font-bold mb-2">Upload</h3>
-              <p className="text-gray-600">Upload your question paper (PDF, image, or text)</p>
+              <h3 className="text-xl font-bold mb-2 dark:text-white">Upload</h3>
+              <p className="text-gray-600 dark:text-gray-400">Upload your question paper (PDF, image, or text)</p>
             </div>
             <div className="text-center">
               <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">2</div>
-              <h3 className="text-xl font-bold mb-2">AI Processes</h3>
-              <p className="text-gray-600">AI extracts and structures questions automatically</p>
+              <h3 className="text-xl font-bold mb-2 dark:text-white">AI Processes</h3>
+              <p className="text-gray-600 dark:text-gray-400">AI extracts and structures questions automatically</p>
             </div>
             <div className="text-center">
               <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">3</div>
-              <h3 className="text-xl font-bold mb-2">Take Exam</h3>
-              <p className="text-gray-600">Students take the exam with timer and navigation</p>
+              <h3 className="text-xl font-bold mb-2 dark:text-white">Take Exam</h3>
+              <p className="text-gray-600 dark:text-gray-400">Students take the exam with timer and navigation</p>
             </div>
             <div className="text-center">
               <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">4</div>
-              <h3 className="text-xl font-bold mb-2">Get Results</h3>
-              <p className="text-gray-600">Instant results with detailed analytics</p>
+              <h3 className="text-xl font-bold mb-2 dark:text-white">Get Results</h3>
+              <p className="text-gray-600 dark:text-gray-400">Instant results with detailed analytics</p>
             </div>
           </div>
         </div>
@@ -205,7 +210,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4">
+      <footer className="bg-gray-900 dark:bg-gray-950 text-white py-12 px-4">
         <div className="container mx-auto">
           <div className="grid md:grid-cols-4 gap-8">
             <div>

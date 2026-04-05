@@ -1,25 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function DarkModeToggle() {
-
   const [dark, setDark] = useState(false);
 
+  // ✅ Sync with <html> class on mount
   useEffect(() => {
-    if (dark) {
+    const isDark = document.documentElement.classList.contains("dark");
+    setDark(isDark);
+  }, []);
+
+  // ✅ Toggle dark class on <html>
+  const toggleDark = () => {
+    const newDark = !dark;
+    setDark(newDark);
+
+    if (newDark) {
       document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
     } else {
       document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
     }
-  }, [dark]);
+  };
 
   return (
     <button
-      onClick={() => setDark(!dark)}
-      className="px-4 py-2 bg-gray-800 text-white rounded-lg"
+      onClick={toggleDark}
+      className="px-4 py-2 rounded-lg bg-gray-800 dark:bg-white text-white dark:text-gray-900 font-medium transition-colors"
     >
-      {dark ? "Light Mode" : "Dark Mode"}
+      {dark ? "☀️ Light Mode" : "🌙 Dark Mode"}
     </button>
   );
 }
