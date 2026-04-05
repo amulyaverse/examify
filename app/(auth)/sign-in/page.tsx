@@ -1,72 +1,102 @@
-export default function SignIn() {
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
+export default function Login() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        // Store user info in localStorage for quick access
+        localStorage.setItem('user', JSON.stringify(data.user));
+        // Redirect to dashboard
+        router.push('/dashboard');
+      } else {
+        setError(data.error || 'Login failed');
+      }
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+    }
+    
+    setLoading(false);
+  }
+
   return (
-    <div className="min-h-screen flex">
-
-      {/* Left Section */}
-      <div className="hidden md:flex w-1/2 bg-green-100 items-center justify-center p-10">
-        <div className="text-center">
-          <img
-  src="/login-image.png"
-  alt="login illustration"
-  className="w-80 mx-auto mb-6"
-/>
-          {/* <h2 className="text-xl font-semibold">
-            Distance Learning Programs
-          </h2>
-          <p className="text-gray-500 text-sm mt-2">
-            Attend live and recorded classes at your own convenience
-          </p> */}
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <div className="text-center mb-6">
+          <Link href="/">
+            <h1 className="text-3xl font-bold text-blue-600 cursor-pointer">🎓 Examify</h1>
+          </Link>
+          <h2 className="text-2xl font-bold mt-4">Welcome Back</h2>
         </div>
-      </div>
-
-      {/* Right Section */}
-      <div className="flex w-full md:w-1/2 items-center justify-center bg-white">
-        <div className="w-96">
-
-          <h1 className="text-2xl font-bold mb-2 text-center">
-            EXAMIFY
-          </h1>
-
-          <p className="text-gray-500 text-center mb-8">
-            Welcome Back
-          </p>
-
-          <input
-            type="text"
-            placeholder="Username or Email"
-            className="w-full border-b p-2 mb-4 outline-none"
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full border-b p-2 mb-2 outline-none"
-          />
-
-          <p className="text-right text-sm text-blue-500 mb-6 cursor-pointer">
-            Forgot password?
-          </p>
-
-          <button className="w-full bg-black text-white py-2 rounded-full">
-            Sign In
+        
+        {error && (
+          <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+            ❌ {error}
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-gray-700 mb-2">Email</label>
+            <input
+              name="email"
+              type="email"
+              required
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="you@example.com"
+            />
+          </div>
+          
+          <div className="mb-6">
+            <label className="block text-gray-700 mb-2">Password</label>
+            <input
+              name="password"
+              type="password"
+              required
+              className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="••••••••"
+            />
+          </div>
+          
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
+          >
+            {loading ? 'Logging in...' : 'Login'}
           </button>
-
-          <div className="text-center my-6 text-gray-400">or</div>
-
-          <button className="w-full border py-2 rounded-full">
-            Sign in with Google
-          </button>
-
-          <p className="text-center mt-6 text-sm">
-            Are you new?{" "}
-            <a href="/sign-up" className="text-blue-500">
-              Create an Account
-            </a>
-          </p>
-
-        </div>
+        </form>
+        
+        <p className="text-center text-gray-600 mt-4">
+          Don't have an account?{' '}
+          <Link href="/signup" className="text-blue-600 hover:underline">
+            Sign Up
+          </Link>
+        </p>
       </div>
-
     </div>
   );
 }
