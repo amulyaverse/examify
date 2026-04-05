@@ -27,6 +27,9 @@ export default function Home() {
           <div className="hidden md:flex space-x-8">
             <a href="#features" className="text-gray-700 hover:text-blue-600 transition">Features</a>
             <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition">How It Works</a>
+    
+    
+    
             <a href="#pricing" className="text-gray-700 hover:text-blue-600 transition">Pricing</a>
             <a href="#contact" className="text-gray-700 hover:text-blue-600 transition">Contact</a>
           </div>
