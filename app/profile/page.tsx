@@ -3,10 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 import { User, Edit2, Save, LogOut, X } from "lucide-react";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -24,33 +26,53 @@ export default function ProfilePage() {
     phone: "",
   });
 
-  // ONLY check if user is logged in - NO auto redirects
+  // Load user data from session or localStorage
   useEffect(() => {
-    const userData = localStorage.getItem("user");
-    
-    if (userData) {
-      try {
-        const parsedUser = JSON.parse(userData);
+    const loadUserData = async () => {
+      // First try to get from NextAuth session
+      if (status === "authenticated" && session?.user) {
         setUser({
-          id: parsedUser.id || "",
-          name: parsedUser.name || "User",
-          email: parsedUser.email || "",
-          phone: parsedUser.phone || "",
+          id: session.user.id || "",
+          name: session.user.name || "User",
+          email: session.user.email || "",
+          phone: "",
           joinDate: new Date().toLocaleDateString(),
         });
         setFormData({
-          name: parsedUser.name || "User",
-          phone: parsedUser.phone || "",
+          name: session.user.name || "User",
+          phone: "",
         });
-      } catch (error) {
-        console.error("Error parsing user data:", error);
+        setLoading(false);
+        return;
       }
-    }
-    
-    setLoading(false);
-  }, []);
+      
+      // Fallback to localStorage
+      const userData = localStorage.getItem("user");
+      if (userData) {
+        try {
+          const parsedUser = JSON.parse(userData);
+          setUser({
+            id: parsedUser.id || "",
+            name: parsedUser.name || "User",
+            email: parsedUser.email || "",
+            phone: parsedUser.phone || "",
+            joinDate: new Date().toLocaleDateString(),
+          });
+          setFormData({
+            name: parsedUser.name || "User",
+            phone: parsedUser.phone || "",
+          });
+        } catch (error) {
+          console.error("Error parsing user data:", error);
+        }
+      }
+      
+      setLoading(false);
+    };
 
-  // MANUAL Save - User must click Save button
+    loadUserData();
+  }, [session, status]);
+
   const handleSaveProfile = async () => {
     setSaving(true);
     try {
@@ -61,6 +83,7 @@ export default function ProfilePage() {
       });
 
       if (response.ok) {
+        // Update localStorage
         const existingUser = JSON.parse(localStorage.getItem("user") || "{}");
         const updatedUser = { ...existingUser, name: formData.name, phone: formData.phone };
         localStorage.setItem("user", JSON.stringify(updatedUser));
@@ -78,10 +101,32 @@ export default function ProfilePage() {
     setSaving(false);
   };
 
-  // MANUAL Logout - User must click Logout button
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    router.push("/auth");
+  // ✅ FIXED: Complete logout function
+  const handleLogout = async () => {
+    try {
+      // Clear NextAuth session
+      await signOut({ redirect: false });
+      
+      // Clear localStorage
+      localStorage.removeItem("user");
+      
+      // Clear sessionStorage
+      sessionStorage.removeItem("sessionActive");
+      sessionStorage.removeItem("loginTime");
+      
+      // Clear cookies
+      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "next-auth.session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "next-auth.callback-url=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "next-auth.csrf-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      
+      // Redirect to auth page
+      router.push("/auth");
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Force redirect even if error
+      router.push("/auth");
+    }
   };
 
   if (loading) {
@@ -95,7 +140,6 @@ export default function ProfilePage() {
     );
   }
 
-  // Show message if not logged in - NO auto redirect
   if (!user.name) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 to-white">
@@ -124,7 +168,6 @@ export default function ProfilePage() {
               <span className="text-2xl">🎓</span>
               <span className="text-xl font-bold text-teal-700">Examify</span>
             </Link>
-            {/* MANUAL Logout Button */}
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition"
@@ -202,15 +245,9 @@ export default function ProfilePage() {
                   )}
                 </div>
 
-                <div>
-                  <label className="text-xs text-gray-500 uppercase tracking-wide">Member Since</label>
-                  <p className="mt-1 text-gray-800">{user.joinDate}</p>
-                </div>
-
                 <div className="pt-4 space-y-3">
                   {editMode ? (
                     <div className="flex gap-3">
-                      {/* MANUAL Save Button */}
                       <button
                         onClick={handleSaveProfile}
                         disabled={saving}
@@ -219,7 +256,6 @@ export default function ProfilePage() {
                         <Save size={16} />
                         {saving ? "Saving..." : "Save Changes"}
                       </button>
-                      {/* MANUAL Cancel Button */}
                       <button
                         onClick={() => {
                           setEditMode(false);
@@ -232,7 +268,6 @@ export default function ProfilePage() {
                       </button>
                     </div>
                   ) : (
-                    /* MANUAL Edit Button */
                     <button
                       onClick={() => setEditMode(true)}
                       className="w-full bg-teal-50 text-teal-700 py-2 rounded-lg hover:bg-teal-100 transition flex items-center justify-center gap-2"
@@ -246,10 +281,10 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Right Column - Actions */}
+          {/* Right Column */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* Stats Cards (Manual - just display) */}
+            {/* Stats Cards */}
             <div className="grid md:grid-cols-3 gap-4">
               <div className="bg-white rounded-xl shadow-md p-6 text-center">
                 <div className="text-3xl mb-2">📊</div>
@@ -268,7 +303,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Quick Actions - Manual Links */}
+            {/* Quick Actions */}
             <div className="bg-white rounded-xl shadow-md p-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
               <div className="grid sm:grid-cols-2 gap-4">
@@ -286,16 +321,6 @@ export default function ProfilePage() {
                     <div className="text-sm text-gray-500">View all your exams</div>
                   </div>
                 </Link>
-              </div>
-            </div>
-
-            {/* My Tests Section */}
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">My Tests</h3>
-              <div className="text-center text-gray-500 py-8">
-                <div className="text-4xl mb-2">📭</div>
-                <p>No tests available yet</p>
-                <p className="text-sm mt-1">Upload your first exam to get started</p>
               </div>
             </div>
           </div>

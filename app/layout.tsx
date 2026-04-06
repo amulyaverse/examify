@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import NextAuthProvider from "./providers/NextAuthProvider";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -20,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       
-      {/* ✅ THIS FIXES DARK MODE */}
+      {/* Dark mode script */}
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -37,7 +38,10 @@ export default function RootLayout({
       </head>
 
       <body className={`${inter.variable} antialiased`}>
-        {children}
+        {/* ✅ Wrap with NextAuth Provider for Google Sign In */}
+        <NextAuthProvider>
+          {children}
+        </NextAuthProvider>
       </body>
     </html>
   );

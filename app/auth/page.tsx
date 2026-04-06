@@ -3,9 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export default function AuthPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [tab, setTab] = useState<"signin" | "signup" | "forgot">("signin");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -14,12 +16,16 @@ export default function AuthPage() {
   // Remember email from signup
   const [rememberedEmail, setRememberedEmail] = useState("");
 
-  // Check if already logged in
+  // Check if already logged in via NextAuth
   useEffect(() => {
-    const userData = localStorage.getItem("user");
-    const token = document.cookie.includes("token=");
-    
-    if (userData && token) {
+    if (status === "authenticated" && session?.user) {
+      // Store user data in localStorage for profile page
+      localStorage.setItem("user", JSON.stringify({
+        id: session.user.id,
+        name: session.user.name,
+        email: session.user.email,
+        avatar: session.user.image,
+      }));
       router.push("/profile");
     }
     
@@ -28,9 +34,9 @@ export default function AuthPage() {
     if (savedEmail) {
       setRememberedEmail(savedEmail);
     }
-  }, [router]);
+  }, [status, session, router]);
 
-  // Sign In Handler
+  // Sign In Handler (Custom credentials)
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -64,7 +70,7 @@ export default function AuthPage() {
     setLoading(false);
   };
 
-  // Sign Up Handler with auto-fill
+  // Sign Up Handler
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -92,17 +98,13 @@ export default function AuthPage() {
       const data = await response.json();
       
       if (response.ok) {
-        // Save email for auto-fill on signin
         localStorage.setItem("rememberedEmail", email);
-        
         setSuccess("Account created! Redirecting to profile...");
         
-        // Auto login - store user data
         localStorage.setItem("user", JSON.stringify(data.user));
         sessionStorage.setItem("sessionActive", "true");
         sessionStorage.setItem("loginTime", new Date().toISOString());
         
-        // Redirect to profile after 1 second
         setTimeout(() => {
           router.push("/profile");
         }, 1000);
@@ -148,11 +150,22 @@ export default function AuthPage() {
     setLoading(false);
   };
 
-  // Google Sign In
+  // ✅ UPDATED: Google Sign In using NextAuth
   const handleGoogleSignIn = () => {
-    // Redirect to Google OAuth (implement with NextAuth or custom)
-    window.location.href = "/api/auth/google/login";
+    signIn("google", { callbackUrl: "/profile" });
   };
+
+  // Show loading while checking session
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#f0f4ff" }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ background: "#f0f4ff" }}>
@@ -281,7 +294,7 @@ export default function AuthPage() {
                 <div style={{ flex: 1, height: 1, background: "#e8eeff" }} />
               </div>
 
-              {/* Google Sign In Button */}
+              {/* ✅ UPDATED: Google Sign In Button using NextAuth */}
               <button
                 type="button"
                 onClick={handleGoogleSignIn}
@@ -293,7 +306,7 @@ export default function AuthPage() {
                   <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
                   <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                 </svg>
-                {tab === "signin" ? "Sign in with Google" : "Sign up with Google"}
+                <span>Continue with Google</span>
               </button>
             </>
           )}
