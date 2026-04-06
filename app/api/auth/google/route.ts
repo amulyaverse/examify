@@ -1,25 +1,26 @@
 import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { connectDB } from '@/lib/db/mongodb';
 import User from '@/lib/db/models/User';
+import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    const { name, email, googleId, avatar } = await req.json();
     
     await connectDB();
     
-    const user = await User.findOne({ email });
-    if (!user) {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
-    }
+    let user = await User.findOne({ email });
     
-    const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) {
-      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+    if (!user) {
+      // Create new user
+      user = await User.create({
+        name,
+        email,
+        googleId,
+        avatar,
+      });
     }
     
     const token = jwt.sign(
@@ -30,7 +31,7 @@ export async function POST(req: Request) {
     
     const response = NextResponse.json({
       success: true,
-      user: { id: user._id, name: user.name, email: user.email }
+      user: { id: user._id, name: user.name, email: user.email, avatar: user.avatar }
     });
     
     response.cookies.set('token', token, {
@@ -44,7 +45,6 @@ export async function POST(req: Request) {
     return response;
     
   } catch (error) {
-    console.error('Login error:', error);
-    return NextResponse.json({ error: 'Login failed' }, { status: 500 });
+    return NextResponse.json({ error: 'Google auth failed' }, { status: 500 });
   }
 }
